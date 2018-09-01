@@ -7,7 +7,7 @@ import random
 
 
 def get_pitch():
-    return (random.randint(0,256),random.randint(0,256),random.randint(0,256))
+    return random.randint(0,256),random.randint(0,256),random.randint(0,256)
 
 # def get_volume():
 #     return 255

@@ -42,7 +42,7 @@ def main():
     try:
     #main loop---------------------------------------------------
         while True:
-            colorWipe(strip, Color(255, 0, 0))  # Red wipe
+            colorWipe(strip, Color(get_color()))  # Red wipe
 
 
     except KeyboardInterrupt:

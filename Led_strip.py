@@ -44,7 +44,7 @@ def main():
         while True:
             q = get_color()
             print(q)
-            colorWipe(strip, Color(get_color()))  # Red wipe
+            colorWipe(strip, Color(q[0],q[1],q[2]))  # Red wipe
 
 
     except KeyboardInterrupt:

@@ -73,6 +73,8 @@ def main():
     #main loop---------------------------------------------------
         while True:
             start_colorSnale(strip)
+    except:
+        pass
 
 
 

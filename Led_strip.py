@@ -34,7 +34,7 @@ def start_colorSnale(strip, wait_ms=50):
         for j in range(snail_len):
             #update the leds
             for i in range(snail_len,strip.numPixels()):
-                strip.setPixelColor(i, led_lst[i])
+                strip.setPixelColor(i, (led_lst[i]))
             strip.show()
 
             #sleep

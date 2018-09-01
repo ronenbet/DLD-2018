@@ -41,7 +41,7 @@ def start_colorSnale(strip, wait_ms=200):
             time.sleep(wait_ms / 1000.0)
 
             #shift right the list
-            for i in range(strip.numPixels()-1,0,-1):
+            for i in range(len(led_lst)-1,0,-1):
                 led_lst[i] = led_lst[i-1]
 
         add_colorsnale(get_color())

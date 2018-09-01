@@ -68,12 +68,7 @@ def main():
     strip.begin()
 
     print('Press Ctrl-C to quit.')
-
-    try:
-    #main loop---------------------------------------------------
-        start_colorSnale(strip)
-    except:
-        pass
+    start_colorSnale(strip)
 
 
 

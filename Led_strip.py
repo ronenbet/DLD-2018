@@ -48,8 +48,12 @@ def start_colorSnale(strip, wait_ms=50):
 
 def add_colorsnale(color):
     """adds color to the snail"""
+    r = color[0]
+    g = color[1]
+    b = color[2]
+
     for i in range(snail_len):
-        led_lst[i] = color
+        led_lst[i] = (r,g,b)
 
 
 

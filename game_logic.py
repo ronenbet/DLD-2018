@@ -41,7 +41,7 @@ def log_print(msg, lvl, clr=False):
         os.system('cls' if os.name == 'nt' else 'clear')
 
     if lvl < DEBUG:
-        print DEBUG_LEVELS[lvl], repr(msg)
+        log_print(DEBUG_LEVELS[lvl], repr(msg))
 
 
 def play_note(note):

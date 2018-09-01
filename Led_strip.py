@@ -79,7 +79,7 @@ def theaterChaseRainbow(strip, wait_ms=50):
 snail_len = 4
 led_lst = [Color(0,0,0)] * (LED_COUNT+snail_len)
 
-def start_colorSnale(strip, wait_ms=200):
+def start_colorSnale(strip, wait_ms=50):
     """wipes a snale across display len pixels at a time"""
     while True:
         for j in range(snail_len):

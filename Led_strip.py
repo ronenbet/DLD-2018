@@ -28,13 +28,13 @@ def colorWipe(strip, color, wait_ms=50):
 snail_len = 4
 led_lst = [Color(0,0,0)] * (LED_COUNT+snail_len)
 
-def start_colorSnale(strip, wait_ms=50):
+def start_colorSnale(strip, wait_ms=200):
     """wipes a snale across display len pixels at a time"""
     while True:
         for j in range(snail_len):
             #update the leds
-            for i in range(snail_len,strip.numPixels()):
-                strip.setPixelColor(i, led_lst[i])
+            for i in range(strip.numPixels()):
+                strip.setPixelColor(i, led_lst[i+snail_len])
             strip.show()
 #Color(led_lst[i][0],led_lst[i][1],led_lst[i][2])
             #sleep

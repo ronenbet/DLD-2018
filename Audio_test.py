@@ -1,44 +1,43 @@
-import alsaaudio, struct
-from aubio.task import *
+import alsaaudio
+import numpy as np
+import aubio
 
 # constants
-CHANNELS = 1
-INFORMAT = alsaaudio.PCM_FORMAT_FLOAT_LE
-RATE = 44100
-FRAMESIZE = 1024
-PITCHALG = aubio_pitch_yin
-PITCHOUT = aubio_pitchm_freq
+samplerate = 44100
+win_s = 2048
+hop_s = win_s // 2
+framesize = hop_s
 
 # set up audio input
 recorder = alsaaudio.PCM(type=alsaaudio.PCM_CAPTURE)
-recorder.setchannels(CHANNELS)
-recorder.setrate(RATE)
-recorder.setformat(INFORMAT)
-recorder.setperiodsize(FRAMESIZE)
+recorder.setperiodsize(framesize)
+recorder.setrate(samplerate)
+recorder.setformat(alsaaudio.PCM_FORMAT_FLOAT_LE)
+recorder.setchannels(1)
 
-# set up pitch detect
-detect = new_aubio_pitchdetection(FRAMESIZE, FRAMESIZE / 2, CHANNELS,
-                                  RATE, PITCHALG, PITCHOUT)
-buf = new_fvec(FRAMESIZE, CHANNELS)
+# create aubio pitch detection (first argument is method, "default" is
+# "yinfft", can also be "yin", "mcomb", fcomb", "schmitt").
+pitcher = aubio.pitch("default", win_s, hop_s, samplerate)
+# set output unit (can be 'midi', 'cent', 'Hz', ...)
+pitcher.set_unit("Hz")
+# ignore frames under this level (dB)
+pitcher.set_silence(-40)
+
+print("Starting to listen, press Ctrl+C to stop")
 
 # main loop
-runflag = 1
-while runflag:
-
-    # read data from audio input
-    [length, data] = recorder.read()
-
-    # convert to an array of floats
-    floats = struct.unpack('f' * FRAMESIZE, data)
-
-    # copy floats into structure
-    for i in range(len(floats)):
-        fvec_write_sample(buf, floats[i], 0, i)
-
-    # find pitch of audio frame
-    freq = aubio_pitchdetection(detect, buf)
-
-    # find energy of audio frame
-    energy = vec_local_energy(buf)
-
-    print "{:10.4f} {:10.4f}".format(freq, energy)
+while True:
+    try:
+        # read data from audio input
+        _, data = recorder.read()
+        # convert data to aubio float samples
+        samples = np.fromstring(data, dtype=aubio.float_type)
+        # pitch of current frame
+        freq = pitcher(samples)[0]
+        # compute energy of current block
+        energy = np.sum(samples**2)/len(samples)
+        # do something with the results
+        print("{:10.4f} {:10.4f}".format(freq,energy))
+    except KeyboardInterrupt:
+        print("Ctrl+C pressed, exiting")
+        break

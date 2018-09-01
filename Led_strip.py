@@ -10,7 +10,7 @@ LED_FREQ_HZ    = 800000  # LED signal frequency in hertz (usually 800khz)
 LED_DMA        = 10      # DMA channel to use for generating signal (try 10)
 LED_INVERT     = False   # True to invert the signal (when using NPN transistor level shift)
 LED_CHANNEL    = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
-
+LED_BRIGHTNESS = 255
 
 def colorWipe(strip, color, wait_ms=50):
     """Wipe color across display a pixel at a time."""
@@ -24,8 +24,6 @@ def colorWipe(strip, color, wait_ms=50):
 
 
 #temp function
-def get_brightness():
-    return Audio_led.get_volume()
 
 def get_color():
     return Audio_led.get_pitch()

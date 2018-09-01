@@ -42,6 +42,8 @@ def main():
     try:
     #main loop---------------------------------------------------
         while True:
+            q = get_color()
+            print(q)
             colorWipe(strip, Color(get_color()))  # Red wipe
 
 

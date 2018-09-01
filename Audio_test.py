@@ -1,43 +1,65 @@
-import alsaaudio
+
+import pyaudio
+import sys
 import numpy as np
 import aubio
 
-# constants
+# initialise pyaudio
+p = pyaudio.PyAudio()
+
+# open stream
+buffer_size = 1024
+pyaudio_format = pyaudio.paFloat32
+n_channels = 1
 samplerate = 44100
-win_s = 2048
-hop_s = win_s // 2
-framesize = hop_s
+stream = p.open(format=pyaudio_format,
+                channels=n_channels,
+                rate=samplerate,
+                input=True,
+                frames_per_buffer=buffer_size)
 
-# set up audio input
-recorder = alsaaudio.PCM(type=alsaaudio.PCM_CAPTURE)
-recorder.setperiodsize(framesize)
-recorder.setrate(samplerate)
-recorder.setformat(alsaaudio.PCM_FORMAT_FLOAT_LE)
-recorder.setchannels(1)
+if len(sys.argv) > 1:
+    # record 5 seconds
+    output_filename = sys.argv[1]
+    record_duration = 5 # exit 1
+    outputsink = aubio.sink(sys.argv[1], samplerate)
+    total_frames = 0
+else:
+    # run forever
+    outputsink = None
+    record_duration = None
 
-# create aubio pitch detection (first argument is method, "default" is
-# "yinfft", can also be "yin", "mcomb", fcomb", "schmitt").
-pitcher = aubio.pitch("default", win_s, hop_s, samplerate)
-# set output unit (can be 'midi', 'cent', 'Hz', ...)
-pitcher.set_unit("Hz")
-# ignore frames under this level (dB)
-pitcher.set_silence(-40)
+# setup pitch
+tolerance = 0.8
+win_s = 4096 # fft size
+hop_s = buffer_size # hop size
+pitch_o = aubio.pitch("default", win_s, hop_s, samplerate)
+pitch_o.set_unit("midi")
+pitch_o.set_tolerance(tolerance)
 
-print("Starting to listen, press Ctrl+C to stop")
-
-# main loop
+print("*** starting recording")
 while True:
     try:
-        # read data from audio input
-        _, data = recorder.read()
-        # convert data to aubio float samples
-        samples = np.fromstring(data, dtype=aubio.float_type)
-        # pitch of current frame
-        freq = pitcher(samples)[0]
-        # compute energy of current block
-        energy = np.sum(samples**2)/len(samples)
-        # do something with the results
-        print("{:10.4f} {:10.4f}".format(freq,energy))
+        audiobuffer = stream.read(buffer_size)
+        signal = np.fromstring(audiobuffer, dtype=np.float32)
+
+        pitch = pitch_o(signal)[0]
+        confidence = pitch_o.get_confidence()
+
+        print("{} / {}".format(pitch,confidence))
+
+        if outputsink:
+            outputsink(signal, len(signal))
+
+        if record_duration:
+            total_frames += len(signal)
+            if record_duration * samplerate < total_frames:
+                break
     except KeyboardInterrupt:
-        print("Ctrl+C pressed, exiting")
+        print("*** Ctrl+C pressed, exiting")
         break
+
+print("*** done recording")
+stream.stop_stream()
+stream.close()
+p.terminate()
